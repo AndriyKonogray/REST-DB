@@ -1,6 +1,8 @@
 package org.db.REST.DB;
 
 import org.db.REST.DB.enums.Gender;
+import org.db.REST.DB.exception.ExistedLoginException;
+import org.db.REST.DB.exception.UnhandledException;
 import org.db.REST.DB.interfaces.UserService;
 import org.db.REST.DB.models.User;
 import org.db.REST.DB.repositories.UserRepository;
@@ -25,26 +27,86 @@ public class UserServiceBaseImplTest {
     @MockBean
     private UserRepository userRepository;
 
-    @BeforeEach
-    public void setUp() {
+    private User defaultUser;
+    private User userWithInvalidLogin;
+
+    private User generateDefaultUser() {
         User alex = new User();
         alex.setFullName("alex");
         alex.setDateOfBirth(Date.valueOf(LocalDate.now()));
         alex.setGender(Gender.valueOf("MALE"));
         alex.setLogin("alex@secret");
+        alex.setId(0L);
+
+        return alex;
+    }
+
+    private User generateUserWithInvalidLogin() {
+        User userWithInvalidLogin = generateDefaultUser();
+        userWithInvalidLogin.setId(userWithInvalidLogin.getId()+1);
+        return userWithInvalidLogin;
+    }
+
+    @BeforeEach
+    private void setUp() {
+
+        defaultUser = generateDefaultUser();
+        userWithInvalidLogin = generateUserWithInvalidLogin();
+        String encodedInvalidLogin = userWithInvalidLogin.getLogin();
+
 
         List<User> users = new ArrayList<>();
-        users.add(alex);
+        users.add(defaultUser);
 
         Mockito.when(userRepository.findAll())
                 .thenReturn(users);
+
+        Mockito.when(userRepository.save(Mockito.any(User.class)))
+                .thenAnswer(i -> i.getArguments()[0]);
+        Mockito.when(userRepository.save(userWithInvalidLogin))
+                .thenThrow(RuntimeException.class);
+
+        Mockito.when(userRepository.findAllByLogin(Mockito.any(String.class)))
+                .thenReturn(new ArrayList<>());
+        Mockito.when(userRepository.findAllByLogin(encodedInvalidLogin))
+                .thenReturn(users);
     }
+
+
 
     @Test
     void getAllUsers() {
 
         List<User> users = userService.getAll();
+        assert (users.size() == 1);
         User user = users.get(0);
         assert (user.getFullName().equals("alex"));
     }
+
+    @Test
+    void createNewUserWithUniqueLogin() {
+
+        User roma = new User();
+        roma.setFullName("roma");
+        roma.setDateOfBirth(Date.valueOf(LocalDate.now()));
+        roma.setGender(Gender.valueOf("MALE"));
+        roma.setLogin("roma@secret");
+
+        User userAfterCreation = userService.create(roma).orElseThrow(UnhandledException::new);
+
+        assert (userAfterCreation.getFullName().equals(roma.getFullName()));
+    }
+
+    @Test
+    void createNewUserWithExistedLogin__throwExistedLoginExceptionByDefault() {
+        try {
+            User userAfterCreation = userService.create(userWithInvalidLogin).orElseThrow(UnhandledException::new);
+        } catch (ExistedLoginException e) {
+            assert true;
+        } catch (RuntimeException e) {
+            assert false;
+        }
+    }
+
+
 }

@@ -1,12 +1,15 @@
 package org.db.REST.DB.services;
 
+import org.db.REST.DB.exception.ExistedLoginException;
 import org.db.REST.DB.interfaces.UserService;
 import org.db.REST.DB.models.User;
 import org.db.REST.DB.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceBaseImpl implements UserService {
@@ -25,23 +28,33 @@ public class UserServiceBaseImpl implements UserService {
     }
 
     @Override
-    public User getById(Long id) {
-        return new User();
+    public Optional<User> getById(@NonNull Long id) {
+        return Optional.empty();
 
     }
 
     @Override
-    public User create(User user) {
-        return new User();
+    public Optional<User> create(@NonNull User user) {
+
+        if(isExistedLogin(user.getLogin())) {
+            throw new ExistedLoginException();
+        }
+
+        return Optional.ofNullable(userRepository.save(user));
     }
 
     @Override
-    public User replace(User user) {
-        return new User();
+    public Optional<User> replace(@NonNull User user) {
+        return Optional.ofNullable(user);
     }
 
     @Override
-    public void deleteById(Long id) {
+    public Optional<User> deleteById(@NonNull Long id) {
+        return Optional.empty();
+    }
 
+    private Boolean isExistedLogin(@NonNull String login) {
+        List<User> users = userRepository.findAllByLogin(login);
+        return !users.isEmpty();
     }
 }

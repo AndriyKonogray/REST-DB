@@ -1,6 +1,7 @@
 package org.db.REST.DB.models;
 
 import org.db.REST.DB.enums.Gender;
+import org.db.REST.DB.services.EncryptionBase64;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -36,7 +37,7 @@ public class User {
     }
 
     public void setLogin(String login) {
-        this.login = login;
+        this.login = EncryptionBase64.encode(login);
     }
 
     public String getFullName() {

@@ -2,6 +2,7 @@ package org.db.REST.DB.controlers;
 
 import org.db.REST.DB.DTOs.UserDTO;
 import org.db.REST.DB.enums.Gender;
+import org.db.REST.DB.exception.UnhandledException;
 import org.db.REST.DB.interfaces.UserService;
 import org.db.REST.DB.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,17 +32,17 @@ public class UserController {
 
     @GetMapping("/{id}")
     UserDTO getUserById(@PathVariable Long id) {
-        return toDTO(userService.getById(id));
+        return toDTO(userService.getById(id).orElseThrow(UnhandledException::new));
     }
 
     @PostMapping
     UserDTO newUser(@RequestBody UserDTO userDTO) {
-        return toDTO(userService.create(toEntity(userDTO)));
+        return toDTO(userService.create(toEntity(userDTO)).orElseThrow(UnhandledException::new));
     }
 
     @PutMapping("/{id}")
     UserDTO replaceUser(@RequestBody UserDTO userDTO) {
-        return toDTO(userService.replace(toEntity(userDTO)));
+        return toDTO(userService.replace(toEntity(userDTO)).orElseThrow(UnhandledException::new));
     }
 
     @DeleteMapping("/{id}")
