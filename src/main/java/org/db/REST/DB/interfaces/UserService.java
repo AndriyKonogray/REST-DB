@@ -10,6 +10,6 @@ public interface UserService {
     Optional<User> getById(Long id);
     Optional<User> create(User user);
     Optional<User> replace(User user);
-    Optional<User> deleteById(Long id);
+    void deleteById(Long id);
 
 }

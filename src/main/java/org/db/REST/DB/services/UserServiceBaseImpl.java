@@ -29,7 +29,7 @@ public class UserServiceBaseImpl implements UserService {
 
     @Override
     public Optional<User> getById(@NonNull Long id) {
-        return Optional.empty();
+        return userRepository.findById(id);
 
     }
 
@@ -45,12 +45,12 @@ public class UserServiceBaseImpl implements UserService {
 
     @Override
     public Optional<User> replace(@NonNull User user) {
-        return Optional.ofNullable(user);
+        return Optional.ofNullable(userRepository.save(user));
     }
 
     @Override
-    public Optional<User> deleteById(@NonNull Long id) {
-        return Optional.empty();
+    public void deleteById(@NonNull Long id) {
+        userRepository.deleteById(id);
     }
 
     private Boolean isExistedLogin(@NonNull String login) {

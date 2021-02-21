@@ -3,6 +3,7 @@ package org.db.REST.DB;
 import org.db.REST.DB.enums.Gender;
 import org.db.REST.DB.exception.ExistedLoginException;
 import org.db.REST.DB.exception.UnhandledException;
+import org.db.REST.DB.exception.UserNotFoundException;
 import org.db.REST.DB.interfaces.UserService;
 import org.db.REST.DB.models.User;
 import org.db.REST.DB.repositories.UserRepository;
@@ -13,10 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @SpringBootTest
 public class UserServiceBaseImplTest {
@@ -33,7 +34,7 @@ public class UserServiceBaseImplTest {
     private User generateDefaultUser() {
         User alex = new User();
         alex.setFullName("alex");
-        alex.setDateOfBirth(Date.valueOf(LocalDate.now()));
+        alex.setDateOfBirth(LocalDate.now());
         alex.setGender(Gender.valueOf("MALE"));
         alex.setLogin("alex@secret");
         alex.setId(0L);
@@ -70,6 +71,11 @@ public class UserServiceBaseImplTest {
                 .thenReturn(new ArrayList<>());
         Mockito.when(userRepository.findAllByLogin(encodedInvalidLogin))
                 .thenReturn(users);
+
+        Mockito.when(userRepository.findById(Mockito.any(Long.class)))
+                .thenReturn(Optional.ofNullable(defaultUser));
+        Mockito.when(userRepository.findById(10L))
+                .thenReturn(Optional.empty());
     }
 
 
@@ -88,7 +94,7 @@ public class UserServiceBaseImplTest {
 
         User roma = new User();
         roma.setFullName("roma");
-        roma.setDateOfBirth(Date.valueOf(LocalDate.now()));
+        roma.setDateOfBirth(LocalDate.now());
         roma.setGender(Gender.valueOf("MALE"));
         roma.setLogin("roma@secret");
 
@@ -101,12 +107,30 @@ public class UserServiceBaseImplTest {
     void createNewUserWithExistedLogin__throwExistedLoginExceptionByDefault() {
         try {
             User userAfterCreation = userService.create(userWithInvalidLogin).orElseThrow(UnhandledException::new);
+
+            assert false;
         } catch (ExistedLoginException e) {
             assert true;
         } catch (RuntimeException e) {
             assert false;
         }
+
     }
 
+    @Test
+    void getExistedUserById() {
+        User user = userService.getById(0L).orElseThrow(() -> new UserNotFoundException(0L));
 
+        assert user.getFullName().equals(defaultUser.getFullName());
+    }
+
+    @Test
+    void getNotExistedUserById() {
+        try {
+            User user = userService.getById(10L).orElseThrow(() -> new UserNotFoundException(10L));
+            assert false;
+        } catch(UserNotFoundException e) {
+            assert true;
+        }
+    }
 }

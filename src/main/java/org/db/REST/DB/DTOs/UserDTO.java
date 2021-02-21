@@ -1,14 +1,22 @@
 package org.db.REST.DB.DTOs;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDate;
+
 public class UserDTO {
 
-    private final long id;
-    private final String login;
-    private final String fullName;
-    private final String dateOfBirth;
-    private final String gender;
+    private long id;
+    private String login;
+    private String fullName;
 
-    public UserDTO(long id, String login, String fullName, String dateOfBirth, String gender) {
+    @DateTimeFormat
+    private LocalDate dateOfBirth;
+    private String gender;
+
+    public UserDTO() {}
+
+    public UserDTO(long id, String login, String fullName, LocalDate dateOfBirth, String gender) {
         this.id = id;
         this.login = login;
         this.fullName = fullName;
@@ -28,11 +36,27 @@ public class UserDTO {
         return fullName;
     }
 
-    public String getDateOfBirth() {
+    public LocalDate getDateOfBirth() {
         return dateOfBirth;
     }
 
     public String getGender() {
         return gender;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }
