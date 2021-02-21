@@ -1,18 +1,27 @@
 package org.db.REST.DB.models;
 
-import javax.persistence.*;
+import org.db.REST.DB.enums.Gender;
 
-@Entity
+import javax.persistence.*;
+import java.util.Date;
+
+@Entity(name = "user")
 @Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(unique = true)
     private String login;
     private String fullName;
-    private String dateOfBirth;
-    private String gender;
+
+    @Temporal(TemporalType.DATE)
+    private Date dateOfBirth;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
 
     public Long getId() {
         return id;
@@ -38,19 +47,19 @@ public class User {
         this.fullName = fullName;
     }
 
-    public String getDateOfBirth() {
+    public Date getDateOfBirth() {
         return dateOfBirth;
     }
 
-    public void setDateOfBirth(String dateOfBirth) {
+    public void setDateOfBirth(Date dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 }

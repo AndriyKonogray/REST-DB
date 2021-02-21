@@ -1,11 +1,13 @@
 package org.db.REST.DB.controlers;
 
 import org.db.REST.DB.DTOs.UserDTO;
+import org.db.REST.DB.enums.Gender;
 import org.db.REST.DB.interfaces.UserService;
 import org.db.REST.DB.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +50,7 @@ public class UserController {
     }
 
     private UserDTO toDTO(User user) {
-        return new UserDTO(user.getId(), user.getLogin(), user.getFullName(), user.getDateOfBirth(), user.getGender());
+        return new UserDTO(user.getId(), user.getLogin(), user.getFullName(), user.getDateOfBirth().toString(), user.getGender().toString());
 
     }
 
@@ -57,8 +59,8 @@ public class UserController {
         user.setId(userDTO.getId());
         user.setLogin(userDTO.getLogin());
         user.setFullName(userDTO.getFullName());
-        user.setDateOfBirth(userDTO.getDateOfBirth());
-        user.setGender(userDTO.getGender());
+        user.setDateOfBirth(Date.valueOf(userDTO.getDateOfBirth()));
+        user.setGender(Gender.valueOf(userDTO.getGender()));
 
         return user;
     }

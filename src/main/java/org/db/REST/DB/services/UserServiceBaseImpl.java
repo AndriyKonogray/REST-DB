@@ -20,11 +20,8 @@ public class UserServiceBaseImpl implements UserService {
 
     @Override
     public List<User> getAll() {
-        User user = new User();
 
-        List<User> users = userRepository.findAll();
-
-        return users;
+        return userRepository.findAll();
     }
 
     @Override
